@@ -219,20 +219,23 @@ def index():
 
     if request.method == "POST":
         if active_tab == "matrix":
-            op = request.form.get("matrix_op", "CA")
-            # allow editing values
-            A = _read_matrix("a", 2, 2)
-            B = _read_matrix("b", 2, 2)
-            C = _read_matrix("c", 3, 2)
+            try:
+                op = request.form.get("matrix_op", "CA")
+                # allow editing values
+                A = _read_matrix("a", 2, 2)
+                B = _read_matrix("b", 2, 2)
+                C = _read_matrix("c", 3, 2)
 
-            if op == "CA":
-                result = Result("CA", _mul_steps(C, A))
-            elif op == "ATB":
-                result = Result(r"A^T + B", _transpose_plus_steps(A, B))
-            elif op == "CBT":
-                result = Result(r"(CB)^T", _cbt_steps(C, B))
-            else:
-                result = Result("Operasi tidak dikenal", [r"Operasi tidak dikenali."])
+                if op == "CA":
+                    result = Result("CA", _mul_steps(C, A))
+                elif op == "ATB":
+                    result = Result(r"A^T + B", _transpose_plus_steps(A, B))
+                elif op == "CBT":
+                    result = Result(r"(CB)^T", _cbt_steps(C, B))
+                else:
+                    result = Result("Operasi tidak dikenal", [r"Operasi tidak dikenali."])
+            except Exception as e:
+                result = Result("Operasi Matriks", [rf"Error: {str(e)}"])
 
         elif active_tab == "inverse":
             # either preset or custom size 3
