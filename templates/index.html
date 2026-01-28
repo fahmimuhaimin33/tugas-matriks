@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kalkulator Matriks & SPL</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+      // MathJax v3 config
+      window.MathJax = {
+        tex: { inlineMath: [['\\(','\\)'], ['$', '$']] },
+        options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div class="brandText">
+        <div class="brandTitle">Matrix Aljabar</div>
+        <div class="brandSub">Operasi Matriks • Invers OBE • SPL (Cramer)</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="apps">
+      <article class="appCard">
+        <div class="appIcon">A</div>
+        <div class="appBody">
+          <h2>Operasi Matriks</h2>
+          <p class="hint">Hitung \(CA\), \(A^T + B\), dan \((CB)^T\) dengan langkah baris–kolom lengkap.</p>
+        </div>
+      </article>
+      <article class="appCard">
+        <div class="appIcon">I</div>
+        <div class="appBody">
+          <h2>Invers OBE</h2>
+          <p class="hint">Visualisasi proses Gauss–Jordan dari \([A \mid I]\) sampai menjadi \(A^{-1}\).</p>
+        </div>
+      </article>
+      <article class="appCard">
+        <div class="appIcon">S</div>
+        <div class="appBody">
+          <h2>SPL Cramer</h2>
+          <p class="hint">Selesaikan SPL 3 variabel dengan determinan \(\det(A)\), \(\det(A_x)\), \(\det(A_y)\), \(\det(A_z)\).</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="tabs" role="tablist" aria-label="Tools">
+        <button class="tab {{ 'is-active' if active_tab=='matrix' else '' }}" form="form-matrix" name="tab" value="matrix" type="submit">Operasi Matriks</button>
+        <button class="tab {{ 'is-active' if active_tab=='inverse' else '' }}" form="form-inverse" name="tab" value="inverse" type="submit">Invers (OBE)</button>
+        <button class="tab {{ 'is-active' if active_tab=='cramer' else '' }}" form="form-cramer" name="tab" value="cramer" type="submit">SPL (Cramer)</button>
+      </div>
+
+      <div class="grid">
+        <!-- MATRIX OPS -->
+        <div class="panel {{ 'is-active' if active_tab=='matrix' else '' }}">
+          <h2>Operasi Matriks</h2>
+          <p class="hint">Input bisa bilangan bulat, desimal, atau pecahan seperti <code>3/5</code>. Hasil ditampilkan eksak.</p>
+
+          <form id="form-matrix" method="post" class="form">
+            <input type="hidden" name="tab" value="matrix">
+
+            <div class="twoCol">
+              <div class="block">
+                <h3>Matriks A (2×2)</h3>
+                <div class="mat">
+                  <input name="a11" value="{{ A[0,0] }}"><input name="a12" value="{{ A[0,1] }}">
+                  <input name="a21" value="{{ A[1,0] }}"><input name="a22" value="{{ A[1,1] }}">
+                </div>
+              </div>
+
+              <div class="block">
+                <h3>Matriks B (2×2)</h3>
+                <div class="mat">
+                  <input name="b11" value="{{ B[0,0] }}"><input name="b12" value="{{ B[0,1] }}">
+                  <input name="b21" value="{{ B[1,0] }}"><input name="b22" value="{{ B[1,1] }}">
+                </div>
+              </div>
+            </div>
+
+            <div class="block">
+              <h3>Matriks C (3×2)</h3>
+              <div class="mat mat-3x2">
+                <input name="c11" value="{{ C[0,0] }}"><input name="c12" value="{{ C[0,1] }}">
+                <input name="c21" value="{{ C[1,0] }}"><input name="c22" value="{{ C[1,1] }}">
+                <input name="c31" value="{{ C[2,0] }}"><input name="c32" value="{{ C[2,1] }}">
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn" name="matrix_op" value="CA" type="submit">Hitung \(CA\)</button>
+              <button class="btn" name="matrix_op" value="ATB" type="submit">Hitung \(A^T + B\)</button>
+              <button class="btn" name="matrix_op" value="CBT" type="submit">Hitung \((CB)^T\)</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- INVERSE -->
+        <div class="panel {{ 'is-active' if active_tab=='inverse' else '' }}">
+          <h2>Invers Matriks (Metode OBE / Gauss-Jordan)</h2>
+          <p class="hint">Pilih preset kelompok (sesuai soal), atau isi manual matriks 3×3.</p>
+
+          <form id="form-inverse" method="post" class="form">
+            <input type="hidden" name="tab" value="inverse">
+
+            <div class="row">
+              <label class="label">Sumber</label>
+              <select name="inv_source">
+                <option value="preset">Preset (Kelompok)</option>
+                <option value="custom">Input Manual 3×3</option>
+              </select>
+              <label class="label">Kelompok</label>
+              <select name="inv_group">
+                <option value="2" {{ 'selected' if inv_group=='2' else '' }}>Kelompok 2</option>
+                <option value="3" {{ 'selected' if inv_group=='3' else '' }}>Kelompok 3</option>
+                <option value="4" {{ 'selected' if inv_group=='4' else '' }}>Kelompok 4</option>
+              </select>
+              <button class="btn" type="submit">Hitung Invers</button>
+            </div>
+
+            <div class="block">
+              <h3>Matriks A (3×3)</h3>
+              <div class="mat mat-3x3">
+                <input name="inv11" value="{{ invA[0,0] }}"><input name="inv12" value="{{ invA[0,1] }}"><input name="inv13" value="{{ invA[0,2] }}">
+                <input name="inv21" value="{{ invA[1,0] }}"><input name="inv22" value="{{ invA[1,1] }}"><input name="inv23" value="{{ invA[1,2] }}">
+                <input name="inv31" value="{{ invA[2,0] }}"><input name="inv32" value="{{ invA[2,1] }}"><input name="inv33" value="{{ invA[2,2] }}">
+              </div>
+              <p class="hint">Kalau pilih <b>Input Manual</b>, nilai di atas yang dipakai. Kalau pilih <b>Preset</b>, dropdown kelompok yang dipakai.</p>
+            </div>
+          </form>
+        </div>
+
+        <!-- CRAMER -->
+        <div class="panel {{ 'is-active' if active_tab=='cramer' else '' }}">
+          <h2>SPL (Aturan Cramer)</h2>
+          <p class="hint">Pilih kelompok, lalu sistem dihitung dengan determinan lengkap untuk setiap variabel.</p>
+
+          <form id="form-cramer" method="post" class="form">
+            <input type="hidden" name="tab" value="cramer">
+            <div class="row">
+              <label class="label">Kelompok</label>
+              <select name="cramer_group">
+                <option value="1" {{ 'selected' if cramer_group=='1' else '' }}>Kelompok 1</option>
+                <option value="2" {{ 'selected' if cramer_group=='2' else '' }}>Kelompok 2</option>
+                <option value="3" {{ 'selected' if cramer_group=='3' else '' }}>Kelompok 3</option>
+                <option value="4" {{ 'selected' if cramer_group=='4' else '' }}>Kelompok 4</option>
+              </select>
+              <button class="btn" type="submit">Selesaikan SPL</button>
+            </div>
+
+            <div class="block mono">
+              {% if cramer_group=='1' %}
+                \(3x + 4y - 5z = 12\)<br/>
+                \(2x + 5y + z = 17\)<br/>
+                \(6x - 2y + 3z = 17\)
+              {% elif cramer_group=='2' %}
+                \(x + y + z = 45\)<br/>
+                \(x - y = -4\)<br/>
+                \(-x + z = 17\)
+              {% elif cramer_group=='3' %}
+                \(a + b - c = 1\)<br/>
+                \(3a - b + c = 0\)<br/>
+                \(a - 3b + 3c = -2\)
+              {% elif cramer_group=='4' %}
+                \(x + 2y = 4\)<br/>
+                \(2x + z = 5\)<br/>
+                \(y - 3z = -6\)
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Output</h2>
+      {% if result %}
+        <div class="resultHead">
+          <div class="badge">{{ result.title }}</div>
+          <div class="small">Output perhitungan</div>
+        </div>
+        <div class="steps">
+          {% for s in result.steps_latex %}
+            <div class="step">
+              <div class="math">{{ s | safe }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="hint">Pilih tab, isi input, lalu klik tombol hitung.</p>
+      {% endif %}
+    </section>
+  </main>
+</div>
+
+</body>
+</html>
